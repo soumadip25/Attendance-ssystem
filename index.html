@@ -135,7 +135,7 @@
 
             if (!user) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-900">
+                    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900">
                         <div className="w-full max-w-sm glass-card rounded-3xl p-8 shadow-2xl animate-in text-center">
                             <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20">
                                 <i className="fas fa-university text-white text-3xl"></i>
@@ -150,6 +150,9 @@
                                 onChange={(e) => setRollInput(e.target.value)}
                             />
                             <p className="mt-4 text-xs text-slate-400">Try 601,602, or 603</p>
+                        </div>
+                        <div className="mt-12 text-center text-slate-400 text-sm font-medium">
+                            Developed by Soumadip
                         </div>
                     </div>
                 );
@@ -247,7 +250,7 @@
 
                     {/* Footer */}
                     <div className="mt-8 text-center text-slate-400 text-sm font-medium">
-                        Developed by soumadip
+                        Developed by Soumadip
                     </div>
                 </div>
             );
