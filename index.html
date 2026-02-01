@@ -243,10 +243,10 @@
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 gap-8">
                         {loginError && (
-                            <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-                                <div className="flex items-center gap-4 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-lg px-6 py-4 rounded-2xl shadow-xl max-w-3xl">
-                                    <i className="fas fa-exclamation-triangle text-2xl text-rose-400"></i>
-                                    <div className="flex-1 font-medium">{loginError}</div>
+                            <div className="fixed top-6 left-4 z-50">
+                                <div className="flex items-start gap-3 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-sm px-4 py-3 rounded-xl shadow-xl max-w-xs sm:max-w-sm text-left">
+                                    <i className="fas fa-exclamation-triangle text-lg text-rose-400 mt-1"></i>
+                                    <div className="flex-1 leading-snug">{loginError}</div>
                                     <button onClick={() => setLoginError('')} className="text-rose-400 hover:text-white">✕</button>
                                 </div>
                             </div>
@@ -283,10 +283,10 @@
             return (
                 <div className="min-h-screen pb-20 max-w-xl mx-auto px-4 pt-8">
                     {loginError && (
-                        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-                            <div className="flex items-center gap-4 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-lg px-6 py-4 rounded-2xl shadow-xl max-w-3xl">
-                                <i className="fas fa-exclamation-triangle text-2xl text-rose-400"></i>
-                                <div className="flex-1 font-medium">{loginError}</div>
+                        <div className="fixed top-6 left-4 z-50">
+                            <div className="flex items-start gap-3 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-sm px-4 py-3 rounded-xl shadow-xl max-w-xs sm:max-w-sm text-left">
+                                <i className="fas fa-exclamation-triangle text-lg text-rose-400 mt-1"></i>
+                                <div className="flex-1 leading-snug">{loginError}</div>
                                 <button onClick={() => setLoginError('')} className="text-rose-400 hover:text-white">✕</button>
                             </div>
                         </div>
