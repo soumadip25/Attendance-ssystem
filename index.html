@@ -124,6 +124,7 @@
             const [subjects, setSubjects] = useState([]);
             const [showModal, setShowModal] = useState(false);
             const [newSub, setNewSub] = useState("");
+            const [loginError, setLoginError] = useState("");
 
             // Device ownership & offline mode
             const [ownerRoll, setOwnerRoll] = useState(localStorage.getItem('device_owner') || null);
@@ -133,10 +134,14 @@
 
             // Login Logic
             useEffect(() => {
-                if (!rollInput) return;
+                if (!rollInput) {
+                    setLoginError('');
+                    return;
+                }
                 if (STUDENT_DB[rollInput]) {
                     const name = STUDENT_DB[rollInput];
                     setUser({ roll: rollInput, name });
+                    setLoginError('');
                     // Load user-specific data
                     const saved = localStorage.getItem(`attendance_${rollInput}`);
                     setSubjects(saved ? JSON.parse(saved) : [
@@ -154,9 +159,8 @@
                     
                     ]);
                 } else if (rollInput.trim().length >= 3) {
-                    // show a short invalid-roll message for longer inputs
-                    setInfoMessage('Invalid roll number — please try again.');
-                    setTimeout(() => setInfoMessage(''), 3000);
+                    // show a persistent login error for invalid rolls
+                    setLoginError('Invalid roll number — please try again.');
                 }
             }, [rollInput]);
 
@@ -238,6 +242,15 @@
             if (!user) {
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 gap-8">
+                        {loginError && (
+                            <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+                                <div className="flex items-center gap-4 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-lg px-6 py-4 rounded-2xl shadow-xl max-w-3xl">
+                                    <i className="fas fa-exclamation-triangle text-2xl text-rose-400"></i>
+                                    <div className="flex-1 font-medium">{loginError}</div>
+                                    <button onClick={() => setLoginError('')} className="text-rose-400 hover:text-white">✕</button>
+                                </div>
+                            </div>
+                        )} 
                         <div className="w-full max-w-sm glass-card rounded-3xl p-8 shadow-2xl animate-in text-center">
                             <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20">
                                 <i className="fas fa-university text-white text-3xl"></i>
@@ -249,11 +262,14 @@
                                 placeholder="e.g. 601" 
                                 className="w-full bg-slate-100 border-none rounded-xl py-4 px-6 text-center text-xl font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                 value={rollInput}
-                                onChange={(e) => setRollInput(e.target.value)}
+                                onChange={(e) => { setRollInput(e.target.value); setLoginError(''); }}
                             />
                             <p className="mt-4 text-xs text-slate-400">Try 601,602, or 603</p>
-                            {infoMessage && (
-                                <div className="mt-3 text-sm text-rose-500 font-medium">{infoMessage}</div>
+                            {loginError && (
+                                <div className="mt-3 inline-flex items-start gap-2 text-sm text-rose-600 bg-rose-50 border border-rose-100 px-3 py-2 rounded-lg shadow-sm">
+                                    <i className="fas fa-exclamation-circle mt-0.5"></i>
+                                    <span className="font-medium">{loginError}</span>
+                                </div>
                             )}
                         </div>
                         <div className="text-center text-slate-300 text-sm font-medium">
@@ -266,6 +282,15 @@
 
             return (
                 <div className="min-h-screen pb-20 max-w-xl mx-auto px-4 pt-8">
+                    {loginError && (
+                        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+                            <div className="flex items-center gap-4 bg-gradient-to-b from-slate-900/90 to-slate-800/80 border-2 border-rose-500 text-white text-lg px-6 py-4 rounded-2xl shadow-xl max-w-3xl">
+                                <i className="fas fa-exclamation-triangle text-2xl text-rose-400"></i>
+                                <div className="flex-1 font-medium">{loginError}</div>
+                                <button onClick={() => setLoginError('')} className="text-rose-400 hover:text-white">✕</button>
+                            </div>
+                        </div>
+                    )}
                     {/* Header */}
                     <header className="flex justify-between items-center mb-8 animate-in">
                         <div>
