@@ -26,7 +26,9 @@
 
         // --- Student Database ---
         const STUDENT_DB = {
+            "601": "Neha Sali",
             "602": "Soumadip Samanta",
+            "603": "Sandesh Shinde",
             "642": "Niranjan Tupe",
             
         };
@@ -66,6 +68,12 @@
             const [showModal, setShowModal] = useState(false);
             const [newSub, setNewSub] = useState("");
 
+            // Device ownership & offline mode
+            const [ownerRoll, setOwnerRoll] = useState(localStorage.getItem('device_owner') || null);
+            const [infoMessage, setInfoMessage] = useState('');
+            const isOwner = user && ownerRoll === user?.roll;
+            const readOnly = user && !isOwner; 
+
             // Login Logic
             useEffect(() => {
                 if (STUDENT_DB[rollInput]) {
@@ -90,6 +98,25 @@
                 }
             }, [rollInput]);
 
+            // Device owner detection
+            useEffect(() => {
+                if (!user) return;
+                const existingOwner = localStorage.getItem('device_owner');
+                if (!existingOwner) {
+                    localStorage.setItem('device_owner', user.roll);
+                    setOwnerRoll(user.roll);
+                    setInfoMessage('Device claimed by this roll. Only this roll can make edits.');
+                    setTimeout(() => setInfoMessage(''), 3500);
+                } else {
+                    setOwnerRoll(existingOwner);
+                    if (existingOwner !== user.roll) {
+                        setInfoMessage("Offline Mode: Login is used only to fetch your Batch/Name. Your attendance is stored locally on this device. You cannot edit others' data.");
+                    } else {
+                        setInfoMessage('');
+                    }
+                }
+            }, [user]);
+
             // Save Logic
             useEffect(() => {
                 if (user) {
@@ -98,6 +125,12 @@
             }, [subjects, user]);
 
             const updateCount = (id, type) => {
+                if (readOnly) {
+                    setInfoMessage(`This device is claimed by ${ownerRoll}. You cannot edit others' data.`);
+                    setTimeout(() => setInfoMessage(''), 3000);
+                    return;
+                }
+
                 setSubjects(prev => prev.map(s => {
                     if (s.id !== id) return s;
                     if (type === 'p') return { ...s, present: s.present + 1, total: s.total + 1 };
@@ -108,6 +141,13 @@
             };
 
             const addSubject = () => {
+                if (readOnly) {
+                    setInfoMessage(`This device is claimed by ${ownerRoll}. You cannot edit others' data.`);
+                    setTimeout(() => setInfoMessage(''), 3000);
+                    setShowModal(false);
+                    return;
+                }
+
                 if (!newSub.trim()) return;
                 setSubjects([...subjects, { id: Date.now(), name: newSub, present: 0, total: 0 }]);
                 setNewSub("");
@@ -166,9 +206,38 @@
                             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Welcome, {user.name.split(' ')[0]}</h2>
                             <p className="text-sm font-bold text-blue-600">Roll: {user.roll}</p>
                         </div>
-                        <button onClick={() => setUser(null)} className="text-slate-400 hover:text-rose-500 transition-colors">
-                            <i className="fas fa-sign-out-alt text-xl"></i>
-                        </button>
+
+                        <div className="flex items-center gap-3">
+                            {infoMessage && (
+                                <div className="bg-slate-800 text-white text-sm px-4 py-2 rounded-md">{infoMessage}</div>
+                            )}
+
+                            <button onClick={() => {
+                                if (readOnly) {
+                                    setInfoMessage(`This device is claimed by ${ownerRoll}. You cannot edit others' data.`);
+                                    setTimeout(() => setInfoMessage(''), 3000);
+                                    return;
+                                }
+                                setShowModal(true);
+                            }} className="text-slate-400 hover:text-slate-600 transition-colors bg-white p-2 rounded-lg shadow-sm border">
+                                <i className="fas fa-plus text-sm text-slate-700"></i>
+                            </button>
+
+                            {isOwner && (
+                                <button onClick={() => {
+                                    localStorage.removeItem('device_owner');
+                                    setOwnerRoll(null);
+                                    setInfoMessage('Device released — another user can claim this device.');
+                                    setTimeout(() => setInfoMessage(''), 3500);
+                                }} className="bg-white p-2 rounded-lg shadow-sm border">
+                                    <i className="fas fa-user-shield text-sm text-slate-700"></i>
+                                </button>
+                            )}
+
+                            <button onClick={() => setUser(null)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <i className="fas fa-sign-out-alt text-xl"></i>
+                            </button>
+                        </div>
                     </header>
 
                     {/* Overall Summary */}
@@ -192,7 +261,14 @@
                     <div className="space-y-4 animate-in">
                         <div className="flex justify-between items-center px-2">
                             <h4 className="font-extrabold text-slate-800 text-sm uppercase tracking-wider">Your Classes</h4>
-                            <button onClick={() => setShowModal(true)} className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm border border-slate-100">
+                            <button onClick={() => {
+                                if (readOnly) {
+                                    setInfoMessage(`This device is claimed by ${ownerRoll}. You cannot edit others' data.`);
+                                    setTimeout(() => setInfoMessage(''), 3000);
+                                    return;
+                                }
+                                setShowModal(true);
+                            }} className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm border border-slate-100">
                                 <i className="fas fa-plus text-xs"></i>
                             </button>
                         </div>
