@@ -133,6 +133,7 @@
 
             // Login Logic
             useEffect(() => {
+                if (!rollInput) return;
                 if (STUDENT_DB[rollInput]) {
                     const name = STUDENT_DB[rollInput];
                     setUser({ roll: rollInput, name });
@@ -152,6 +153,10 @@
                         { id: 11, name: "mechanics tutorial", present: 0, total: 0 }, 
                     
                     ]);
+                } else if (rollInput.trim().length >= 3) {
+                    // show a short invalid-roll message for longer inputs
+                    setInfoMessage('Invalid roll number — please try again.');
+                    setTimeout(() => setInfoMessage(''), 3000);
                 }
             }, [rollInput]);
 
@@ -247,6 +252,9 @@
                                 onChange={(e) => setRollInput(e.target.value)}
                             />
                             <p className="mt-4 text-xs text-slate-400">Try 601,602, or 603</p>
+                            {infoMessage && (
+                                <div className="mt-3 text-sm text-rose-500 font-medium">{infoMessage}</div>
+                            )}
                         </div>
                         <div className="text-center text-slate-300 text-sm font-medium">
                             Developed by <span className="font-bold">Soumadip</span>
