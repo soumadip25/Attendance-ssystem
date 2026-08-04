@@ -90,6 +90,60 @@
             "662": "Ankit Yedekar"
         };
 
+        const DEFAULT_SUBJECTS = [
+            { id: 1, name: "Mathematics", present: 0, total: 0 },
+            { id: 2, name: "DSA", present: 0, total: 0 },
+            { id: 3, name: "AEC", present: 0, total: 0 },
+            { id: 4, name: "HVSE", present: 0, total: 0 },
+            { id: 5, name: "DBMS", present: 0, total: 0 },
+            { id: 6, name: "PFM", present: 0, total: 0 },
+            { id: 7, name: "Maths tutorial", present: 0, total: 0 },
+            { id: 8, name: "DSA practical", present: 0, total: 0 },
+            { id: 9, name: "DC practical", present: 0, total: 0 },
+            { id: 10, name: "DC SD", present: 0, total: 0 },
+        ];
+
+        const getStoredSubjects = (roll) => {
+            try {
+                const saved = localStorage.getItem(`attendance_${roll}`);
+                if (!saved) return DEFAULT_SUBJECTS.map(subject => ({ ...subject }));
+
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.every(subject => subject && typeof subject.name === 'string' && typeof subject.present === 'number' && typeof subject.total === 'number')) {
+                    return parsed.map(subject => ({ ...subject }));
+                }
+            } catch (error) {
+                console.warn(`Could not load attendance for roll ${roll}:`, error);
+            }
+
+            return DEFAULT_SUBJECTS.map(subject => ({ ...subject }));
+        };
+
+        const saveStoredSubjects = (roll, subjects) => {
+            try {
+                localStorage.setItem(`attendance_${roll}`, JSON.stringify(subjects));
+            } catch (error) {
+                console.warn(`Could not save attendance for roll ${roll}:`, error);
+            }
+        };
+
+        const getStoredOwnerRoll = () => {
+            try {
+                return localStorage.getItem('device_owner') || null;
+            } catch (error) {
+                console.warn('Could not read device owner:', error);
+                return null;
+            }
+        };
+
+        const saveStoredOwnerRoll = (roll) => {
+            try {
+                localStorage.setItem('device_owner', roll);
+            } catch (error) {
+                console.warn('Could not save device owner:', error);
+            }
+        };
+
         const ProgressCircle = ({ percentage, size = 60, stroke = 5 }) => {
             const radius = (size / 2) - stroke;
             const circumference = radius * 2 * Math.PI;
@@ -127,7 +181,7 @@
             const [loginError, setLoginError] = useState("");
 
             // Device ownership & offline mode
-            const [ownerRoll, setOwnerRoll] = useState(localStorage.getItem('device_owner') || null);
+            const [ownerRoll, setOwnerRoll] = useState(getStoredOwnerRoll());
             const [infoMessage, setInfoMessage] = useState('');
             const isOwner = user && ownerRoll === user?.roll;
             const readOnly = user && !isOwner; 
@@ -142,22 +196,7 @@
                     const name = STUDENT_DB[rollInput];
                     setUser({ roll: rollInput, name });
                     setLoginError('');
-                    // Load user-specific data
-                    const saved = localStorage.getItem(`attendance_${rollInput}`);
-                    setSubjects(saved ? JSON.parse(saved) : [
-                        { id: 1, name: "Mathematics", present: 0, total: 0 },
-                        { id: 2, name: "DSA", present: 0, total: 0 },
-                        { id: 3, name: "AEC", present: 0, total: 0 },
-                        { id: 4, name: "HVSE", present: 0, total: 0 },
-                        { id: 5, name: "DBMS", present: 0, total: 0 },
-                        { id: 6, name: "PFM", present: 0, total: 0 },
-                        { id: 7, name: "Maths tutorial", present: 0, total: 0 },
-                        { id: 8, name: "DSA practical", present: 0, total: 0 },
-                        { id: 9, name: "DC practical", present: 0, total: 0 },
-                        { id: 10, name: "DC SD", present: 0, total: 0 },
-                       
-                    
-                    ]);
+                    setSubjects(getStoredSubjects(rollInput));
                 } else if (rollInput.trim().length >= 3) {
                     // show a persistent login error for invalid rolls
                     setLoginError('Invalid roll number — please try again.');
@@ -167,9 +206,9 @@
             // Device owner detection
             useEffect(() => {
                 if (!user) return;
-                const existingOwner = localStorage.getItem('device_owner');
+                const existingOwner = getStoredOwnerRoll();
                 if (!existingOwner) {
-                    localStorage.setItem('device_owner', user.roll);
+                    saveStoredOwnerRoll(user.roll);
                     setOwnerRoll(user.roll);
                     setInfoMessage('Device claimed by this roll. Only this roll can make edits.');
                     setTimeout(() => setInfoMessage(''), 3500);
@@ -186,7 +225,7 @@
             // Save Logic
             useEffect(() => {
                 if (user) {
-                    localStorage.setItem(`attendance_${user.roll}`, JSON.stringify(subjects));
+                    saveStoredSubjects(user.roll, subjects);
                 }
             }, [subjects, user]);
 
