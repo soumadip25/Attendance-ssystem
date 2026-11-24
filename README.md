@@ -1,8 +1,6 @@
-# PCE Attendance Tracker (Division F)
+# PCE Attendance Tracker 
 
 A lightweight web app for students of Pillai College of Engineering (PCE), to track attendance and monitor the 75% attendance criteria.
-
-Built by Soumadip Samanta.
 
 ## Features
 
